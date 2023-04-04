@@ -5,10 +5,10 @@ export class CreateCardDto {
     @ApiProperty({ example: 'Name', description: "John" })
     @IsNotEmpty()
     @IsString()
-    name: string;
+    type: string;
 
     @ApiProperty({ example: '9989 9142 2303 1234', description: "card code" })
     @IsNotEmpty()
     @IsNumber()
-    card_code: number;
+    user_id: number;
 }

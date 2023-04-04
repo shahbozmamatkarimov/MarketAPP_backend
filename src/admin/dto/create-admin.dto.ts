@@ -17,11 +17,6 @@ export class CreateAdminDto {
     @IsString()
     email: string;
 
-    @ApiProperty({ example: 'example@gmail.com', description: "your email" })
-    @IsNotEmpty()
-    @IsBoolean()
-    is_active: boolean;
-
     @ApiProperty({ example: 'Password', description: "john2201" })
     @IsNotEmpty()
     @IsString()

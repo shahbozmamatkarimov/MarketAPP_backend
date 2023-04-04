@@ -6,7 +6,6 @@ import { resolve } from 'path';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
 import { LikesModule } from './likes/likes.module';
-import { ProfileModule } from './profile/profile.module';
 import { ProductModule } from './product/product.module';
 import { CardModule } from './card/card.module';
 import { ProductTypeModule } from './product_type/product_type.module';
@@ -35,7 +34,6 @@ import { RegionModule } from './region/region.module';
     AdminModule,
     UserModule,
     LikesModule,
-    ProfileModule,
     ProductModule,
     CardModule,
     ProductTypeModule,

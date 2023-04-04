@@ -1,11 +1,11 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
-interface RegionAttr{
-    region: string;
+interface CountryAttr{
+    country: string;
 }
 
-@Table({tableName: 'region'})
-export class Region extends Model<Region, RegionAttr> {
+@Table({tableName: 'country'})
+export class Country extends Model<Country, CountryAttr> {
     @Column({
         type: DataType.INTEGER,
         autoIncrement: true,
@@ -17,5 +17,5 @@ export class Region extends Model<Region, RegionAttr> {
         type: DataType.STRING,
         allowNull: false,
     })
-    region: string;
+    country: string;
 }
