@@ -4,6 +4,7 @@ import { Like } from "../../likes/entities/like.entity";
 import { Location } from "../../location/entities/location.entity";
 import { Card } from "../../card/entities/card.entity";
 import { Comments } from "../../comments/entities/comment.entity";
+import { ProductType } from "../../product_type/entities/product_type.entity";
 
 interface ProductAttr {
     user_id: number;
@@ -99,7 +100,7 @@ export class Product extends Model<Product, ProductAttr> {
     })
     comments_id: number;
 
-    @ForeignKey(() => Product_type)
+    @ForeignKey(() => ProductType)
     @Column({
         type: DataType.NUMBER,
         allowNull: true,
