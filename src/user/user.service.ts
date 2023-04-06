@@ -1,19 +1,21 @@
-import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
-import * as uuid from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from "express"
-import { MailService } from '../mail/mail.service';
-import * as otpGenerator from 'otp-generator';
+import otpGenerator from 'otp-generator';
 import { Op } from 'sequelize';
 import { AddMinutesToDate } from '../helpers/addMinutes';
 import { v4 } from 'uuid';
 import { encode, decode, dates } from '../helpers/crypto';
 import { User } from './entities/user.entity';
 import { UserLoginDto } from './dto/user-login.dto';
+import { VerifyOtpDto } from './dto/verifyOtp.dto';
+import { PhoneUserDto } from './dto/phone-user.dto';
+import { Otp } from '../otp/models/otp.model';
+import { FilesService } from '../files/files.service';
+import { CreateUserDto } from './dto/create-user.dto';
 export interface Tokens {
   access_token: string;
   refresh_token: string
@@ -27,7 +29,7 @@ export class UsersService {
     @InjectModel(Otp) private otpRepo: typeof Otp,
     // private readonly fileService: FilesService,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
+    // private readonly mailService: MailService,
     // private readonly botService: BotService
   ) { }
 
@@ -39,24 +41,21 @@ export class UsersService {
     if (user) {
       throw new BadRequestException('Username is of exist!');
     };
-    if (createUserDto.password !== createUserDto.confirm_password) {
-      throw new BadRequestException('Password is not match!');
-    };
 
     const hashed_password = await bcrypt.hash(createUserDto.password, 7);
     const newUser = await this.userRepo.create({
       ...createUserDto,
       hashed_password: hashed_password
     });
+
     const tokens = await this.generateToken(newUser)
     const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7)
-    const uniqueKey: string = uuid.v4();
     const updateUser = await this.userRepo.update(
-      { hashed_refresh_token: hashed_refresh_token, activation_link: uniqueKey },
+      { hashed_refresh_token: hashed_refresh_token },
       { where: { id: newUser.id }, returning: true }
     );
 
-    await this.mailService.sendUserConfirmation(updateUser[1][0])
+    // await this.mailService.sendUserConfirmation(updateUser[1][0])
     return this.writingCookie(tokens, updateUser[1][0], res, 'User registrated');
   }
 
@@ -108,28 +107,6 @@ export class UsersService {
     return response;
   }
 
-
-  async activate(link: string) {
-    if (!link) {
-      throw new BadRequestException('Activation link not found!');
-    };
-
-    const updatedUser = await this.userRepo.update(
-      { is_active: true },
-      { where: { activation_link: link, is_active: false }, returning: true }
-    );
-    const reponse = {
-      message: "User activated successfully",
-      user: updatedUser[1][0]
-    }
-
-    if (updatedUser[1][0]) {
-      throw new BadRequestException('User already activated')
-    };
-    return reponse;
-  }
-
-
   async refreshToken(user_id: number, refreshToken: string, res: Response) {
     const decodedToken = this.jwtService.decode(refreshToken);
     if (user_id != decodedToken['id']) {
@@ -157,7 +134,7 @@ export class UsersService {
 
 
   private async generateToken(user: User) {
-    const jwtPayload = { id: user.id, is_active: user.is_active, is_owner: user.is_owner };
+    const jwtPayload = { id: user.id };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: process.env.ACCESS_TOKEN_KEY,
@@ -198,10 +175,10 @@ export class UsersService {
       lowerCaseAlphabets: false,
       specialChars: false
     });
-    const is_send = await this.botService.sendOTP(phone_number, otp);
-    if (!is_send) {
-      throw new HttpException("Avval botdan ro'yxatdan o'ting", HttpStatus.BAD_REQUEST);
-    };
+    // const is_send = await this.botService.sendOTP(phone_number, otp);
+    // if (!is_send) {
+    //   throw new HttpException("Avval botdan ro'yxatdan o'ting", HttpStatus.BAD_REQUEST);
+    // };
     const now = new Date();
     const expiration_time = AddMinutesToDate(now, 5);
     await this.otpRepo.destroy({ where: { [Op.and]: [{ check: phone_number }, { verified: false }] } });
@@ -226,29 +203,7 @@ export class UsersService {
     if (result != null) {
       if (!result.verified) {
         if (dates.compare(result.expiration_time, currentdate)) {
-          if (otp === result.otp) {
-            const user = await this.userRepo.findOne({
-              where: { phone: check },
-            });
-            console.log(user);
-            if (user) {
-              const updatedUser = await this.userRepo.update(
-                { is_owner: true },
-                { where: { id: user.id }, returning: true },
-              );
-              await this.otpRepo.update(
-                { verified: true },
-                { where: { id: obj.otp_id }, returning: true }
-              )
-              const response = {
-                message: 'User updated as owner',
-                user: updatedUser[1][0],
-              };
-              return response;
-            }
-          } else {
             throw new BadRequestException('Otp is not match');
-          }
         } else {
           throw new BadRequestException('Otp expired');
         }

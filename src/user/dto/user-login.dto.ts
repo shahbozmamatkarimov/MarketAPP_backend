@@ -16,4 +16,9 @@ export class UserLoginDto {
     @IsNotEmpty()
     @IsStrongPassword()
     password: string;
+
+    @ApiProperty({ example: 'p@$w0rd', description: "password" })
+    @IsNotEmpty()
+    @IsStrongPassword()
+    confirm_password: string;
 }

@@ -5,19 +5,21 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { FilesModule } from '../files/files.module';
-import { MailModule } from '../mail/mail.module';
+import { OtpModule } from '../otp/otp.module';
+import { Otp } from '../otp/models/otp.model';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, Otp]),
     JwtModule.register({
       secret: 'MySecretKey',
       signOptions: {
         expiresIn: '24h'
       },
     }),
-    FilesModule,
-    MailModule,
+    // FilesModule,
+    OtpModule,
+    // MailModule
   ],
   controllers: [UserController],
   providers: [UsersService]

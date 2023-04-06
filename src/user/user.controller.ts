@@ -1,41 +1,107 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { UserService } from './user.service';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserSelfGuard } from '../guards/user-self.guard';
+import { JwtGuard } from '../guards/jwt-auth.guard';
+import { Response } from 'express';
+import { VerifyOtpDto } from './dto/verifyOtp.dto';
+import { CookieGetter } from '../decorators/cookieGetter.decorator';
+import { PhoneUserDto } from './dto/phone-user.dto';
+import { UserLoginDto } from './dto/user-login.dto';
 
 @ApiTags("User")
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly usersService: UsersService) { }
 
-  @ApiOperation({ summary: 'Create new user' })
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @ApiOperation({ summary: 'Registration' })
+  @Post('signup')
+  registration(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
+    return this.usersService.registration(createUserDto, res);
+  }
+
+  // @Post('find')
+  // findAll(@Body() findUserDto: FindUserDto) {
+  //   return this.usersService.findAll(findUserDto)
+  // }
+
+  @ApiOperation({ summary: 'Login' })
+  @HttpCode(HttpStatus.OK)
+  @Post('signin')
+  login(@Body() loginUserDto: UserLoginDto, @Res({ passthrough: true }) res: Response) {
+    return this.usersService.login(loginUserDto, res);
+  }
+
+
+  @ApiOperation({ summary: 'Logout' })
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  logout(@CookieGetter('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
+    return this.usersService.logout(refreshToken, res);
+  }
+
+
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/refresh')
+  refreshToken(@Param('id') id: number, @CookieGetter('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
+    return this.usersService.refreshToken(id, refreshToken, res);
   }
 
   @ApiOperation({ summary: 'Get all users' })
-  @Get()
+  @UseGuards(JwtGuard)
+  @Get('all')
   findAll() {
-    return this.userService.findAll();
+    return this.usersService.findAll();
   }
 
-  @ApiOperation({ summary: 'Get user by id' })
+  @ApiOperation({ summary: 'Send OTP' })
+  @Post('otp')
+  newOtp(@Body() phoneUserDto: PhoneUserDto) {
+    return this.usersService.newOtp(phoneUserDto);
+  }
+
+
+  @ApiOperation({ summary: 'Verify OTP' })
+  @Post('verify')
+  verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.usersService.verifyOtp(verifyOtpDto);
+  }
+
+
+  @ApiOperation({ summary: 'Get user by ID' })
+  @UseGuards(UserSelfGuard)
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.usersService.findOne(+id);
   }
 
-  @ApiOperation({ summary: 'Update user' })
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @ApiOperation({ summary: 'Get user by email' })
+  @UseGuards(UserSelfGuard)
+  @UseGuards(JwtGuard)
+  @Get(':email')
+  getUserByEmail(@Param('email') email: string) {
+    return this.usersService.getUserByEmail(email);
   }
 
-  @ApiOperation({ summary: 'Delete user' })
+
+  @ApiOperation({ summary: 'Delete a user' })
+  @ApiResponse({ status: 203 })
+  @UseGuards(UserSelfGuard)
+  @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.usersService.remove(+id);
+  }
+
+
+  @ApiOperation({ summary: 'Update user by ID' })
+  @UseGuards(UserSelfGuard)
+  @UseGuards(JwtGuard)
+  @Post(':id')
+  updateUser(@Param('id') updateUserDto: UpdateUserDto, id: string) {
+    return this.usersService.updateUser(updateUserDto, +id);
   }
 }

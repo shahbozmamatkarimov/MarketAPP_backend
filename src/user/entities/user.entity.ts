@@ -1,13 +1,20 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
-interface UserAttr{
-    name: string;
-    login: string;
+interface UserAttr {
+    username: string;
+    first_name: string;
+    last_name: string;
+    passportId: number;
+    address: string;
+    user_photo: string;
+    phone_number: string;
+    email: string;
     hashed_password: string;
     hashed_refresh_token: string;
+
 }
 
-@Table({tableName: 'user'})
+@Table({ tableName: 'user' })
 export class User extends Model<User, UserAttr> {
     @Column({
         type: DataType.INTEGER,
