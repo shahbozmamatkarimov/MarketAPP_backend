@@ -5,12 +5,7 @@ export class CreateAdminDto {
     @ApiProperty({ example: 'Name', description: "John" })
     @IsNotEmpty()
     @IsString()
-    name: string;
-
-    @ApiProperty({ example: '+998991422303', description: "phone number" })
-    @IsNotEmpty()
-    @IsString()
-    phone_number: string;
+    username: string;
 
     @ApiProperty({ example: 'example@gmail.com', description: "your email" })
     @IsNotEmpty()
@@ -21,4 +16,9 @@ export class CreateAdminDto {
     @IsNotEmpty()
     @IsString()
     hashed_password: string;
+
+    @ApiProperty({ example: '+998991422303', description: "phone number" })
+    @IsNotEmpty()
+    @IsString()
+    phone_number: string;
 }

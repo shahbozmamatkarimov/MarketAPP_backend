@@ -17,14 +17,14 @@ export class Card extends Model<Card, CardAttr> {
     id: number;
 
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     type: string;
 
     @ForeignKey(() => User)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     user_id: number;

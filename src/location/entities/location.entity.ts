@@ -28,21 +28,21 @@ export class Location extends Model<Location, LocationAttr> {
 
     @ForeignKey(() => District)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     district_id: number;
 
     @ForeignKey(() => Region)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     region_id: number;
 
     @ForeignKey(() => Country)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     country_id: number;

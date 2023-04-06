@@ -1,12 +1,25 @@
 import { Module } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UsersService } from './user.service';
 import { UserController } from './user.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { FilesModule } from '../files/files.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User])],
+  imports: [
+    SequelizeModule.forFeature([User]),
+    JwtModule.register({
+      secret: 'MySecretKey',
+      signOptions: {
+        expiresIn: '24h'
+      },
+    }),
+    FilesModule,
+    MailModule,
+  ],
   controllers: [UserController],
-  providers: [UserService]
+  providers: [UsersService]
 })
-export class UserModule {}
+export class UserModule { }

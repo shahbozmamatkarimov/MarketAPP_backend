@@ -3,16 +3,12 @@ import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Admin } from './entities/admin.entity';
-import { JwtModule } from '@nestjs/jwt';
+import { FilesModule } from '../files/files.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Admin]),
-  JwtModule.register({
-    secret: 'MySecretKey',
-    signOptions: {
-      expiresIn: '24h'
-    },
-  }),
+  imports: [
+    SequelizeModule.forFeature([Admin]),
+    FilesModule
   ],
   controllers: [AdminController],
   providers: [AdminService],

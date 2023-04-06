@@ -31,14 +31,14 @@ export class Product extends Model<Product, ProductAttr> {
 
     @ForeignKey(() => User)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     user_id: number;
 
     @ForeignKey(() => Like)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     likes_id: number;
@@ -81,28 +81,28 @@ export class Product extends Model<Product, ProductAttr> {
 
     @ForeignKey(() => Location)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     location_id: number;
 
     @ForeignKey(() => Card)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     card_id: number;
 
     @ForeignKey(() => Comments)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     comments_id: number;
 
     @ForeignKey(() => ProductType)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     product_type_id: number;

@@ -1,5 +1,6 @@
 import { Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
 import { User } from "../../user/entities/user.entity";
+import { Product } from "../../product/entities/product.entity";
 
 interface CommentsAttr{
     comment: string;
@@ -26,14 +27,14 @@ export class Comments extends Model<Comments, CommentsAttr> {
     
     @ForeignKey(() => User)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     user_id: number;
 
-    @ForeignKey(() => User)
+    @ForeignKey(() => Product)
     @Column({
-        type: DataType.NUMBER,
+        type: DataType.INTEGER,
         allowNull: true,
     })
     product_id: number;
