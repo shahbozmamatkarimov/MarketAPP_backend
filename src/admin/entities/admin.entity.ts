@@ -58,10 +58,4 @@ export class Admin extends Model<Admin, AdminAttr> {
         defaultValue: false
     })
     is_creater: boolean;
-
-    @Column({
-        type:DataType.BOOLEAN,
-        defaultValue: true
-    })
-    is_active: boolean;
 }

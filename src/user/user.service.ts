@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from "express"
-import otpGenerator from 'otp-generator';
+import * as otpGenerator from 'otp-generator';
 import { Op } from 'sequelize';
 import { AddMinutesToDate } from '../helpers/addMinutes';
 import { v4 } from 'uuid';
@@ -14,8 +14,8 @@ import { UserLoginDto } from './dto/user-login.dto';
 import { VerifyOtpDto } from './dto/verifyOtp.dto';
 import { PhoneUserDto } from './dto/phone-user.dto';
 import { Otp } from '../otp/models/otp.model';
-import { FilesService } from '../files/files.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { MailService } from '../mail/mail.service';
 export interface Tokens {
   access_token: string;
   refresh_token: string
@@ -27,38 +27,37 @@ export class UsersService {
   constructor(
     @InjectModel(User) private userRepo: typeof User,
     @InjectModel(Otp) private otpRepo: typeof Otp,
-    // private readonly fileService: FilesService,
+    private readonly mailService: MailService,
     private readonly jwtService: JwtService,
-    // private readonly mailService: MailService,
-    // private readonly botService: BotService
   ) { }
 
-  async registration(createUserDto: CreateUserDto, res: Response) {
-    const user = await this.userRepo.findOne({
-      where: { username: createUserDto.username }
+  async register(createUserDto: CreateUserDto, res: Response) {
+    const email = await this.userRepo.findOne({
+      where: { email: createUserDto.email }
     });
-
-    if (user) {
-      throw new BadRequestException('Username is of exist!');
+    if (email) {
+      throw new BadRequestException("Email already registered!");
     };
-
-    const hashed_password = await bcrypt.hash(createUserDto.password, 7);
-    const newUser = await this.userRepo.create({
-      ...createUserDto,
-      hashed_password: hashed_password
+    const exist_phone = await this.userRepo.findOne({
+      where: { phone_number: createUserDto.phone_number }
     });
-
-    const tokens = await this.generateToken(newUser)
+    if (exist_phone) {
+      throw new BadRequestException("Phone number already registered!");
+    };
+    const hashed_password = await bcrypt.hash(createUserDto.password, 7);
+    const user = await this.userRepo.create({
+      ...createUserDto, hashed_password
+    });
+    const tokens = await this.generateToken(user);
     const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7)
     const updateUser = await this.userRepo.update(
-      { hashed_refresh_token: hashed_refresh_token },
-      { where: { id: newUser.id }, returning: true }
+      { hashed_refresh_token }, { where: { id: user.id }, returning: true }
     );
 
-    // await this.mailService.sendUserConfirmation(updateUser[1][0])
-    return this.writingCookie(tokens, updateUser[1][0], res, 'User registrated');
+    // await this.mailService.sendOtpToEmail(updateUser[1][0]);
+    console.log(createUserDto);
+    return this.writingCookie(tokens, updateUser[1][0], res, 'User registrated successfully');
   }
-
 
   async login(loginUserDto: UserLoginDto, res: Response) {
     const { email, password } = loginUserDto;
@@ -66,8 +65,9 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('User not registered!!');
     };
+    console.log('1');
 
-    const isMatchPass = await bcrypt.compare(password, user.hashed_password);
+    const isMatchPass = await bcrypt.compare(password, user.hashed_password,);
     if (!isMatchPass) {
       throw new BadRequestException('User not registered(pass)!!');
     };
@@ -85,6 +85,7 @@ export class UsersService {
     return this.userRepo.findAll({ include: { all: true } });
   }
 
+  
   async logout(refreshToken: string, res: Response) {
     const userData = await this.jwtService.verify(refreshToken, {
       secret: process.env.REFRESH_TOKEN_KEY,
@@ -167,14 +168,15 @@ export class UsersService {
 
 
   async newOtp(phoneUserDto: PhoneUserDto) {
-    console.log(phoneUserDto);
-
     const phone_number = phoneUserDto.phone;
     const otp = otpGenerator.generate(4, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false
     });
+
+    console.log(otp);
+
     // const is_send = await this.botService.sendOTP(phone_number, otp);
     // if (!is_send) {
     //   throw new HttpException("Avval botdan ro'yxatdan o'ting", HttpStatus.BAD_REQUEST);
@@ -203,7 +205,8 @@ export class UsersService {
     if (result != null) {
       if (!result.verified) {
         if (dates.compare(result.expiration_time, currentdate)) {
-            throw new BadRequestException('Otp is not match');
+          console.log(result);
+          throw new BadRequestException('Otp is not match');
         } else {
           throw new BadRequestException('Otp expired');
         }
@@ -229,7 +232,7 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    return await this.userRepo.destroy({ where: { id } });
+    return this.userRepo.destroy({ where: { id } });
   }
 
   async updateUser(updateUserDto: UpdateUserDto, id: number) {

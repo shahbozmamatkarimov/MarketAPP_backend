@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { FilesModule } from '../files/files.module';
 import { OtpModule } from '../otp/otp.module';
 import { Otp } from '../otp/models/otp.model';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -17,9 +18,7 @@ import { Otp } from '../otp/models/otp.model';
         expiresIn: '24h'
       },
     }),
-    // FilesModule,
-    OtpModule,
-    // MailModule
+    MailModule
   ],
   controllers: [UserController],
   providers: [UsersService]

@@ -9,10 +9,19 @@ import { Location } from '../location/entities/location.entity';
 import { Card } from '../card/entities/card.entity';
 import { Comments } from '../comments/entities/comment.entity';
 import { ProductType } from '../product_type/entities/product_type.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Product, User, Like, Location, Card, Comments, ProductType])],
+  imports: [
+    SequelizeModule.forFeature([Product, User, Like, Location, Card, Comments, ProductType]),
+    JwtModule.register({
+      secret: 'MySecretKey',
+      signOptions: {
+        expiresIn: '24h'
+      },
+    }),
+  ],
   controllers: [ProductController],
   providers: [ProductService]
 })
-export class ProductModule {}
+export class ProductModule { }

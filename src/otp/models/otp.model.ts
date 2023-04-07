@@ -11,10 +11,6 @@ interface OtpAttr {
 
 @Table({ tableName: "otp" })
 export class Otp extends Model<Otp, OtpAttr> {
-    @ApiProperty({ example: "1434j5h3214432kl" })
-    @Column({ type: DataType.UUID, primaryKey: true, allowNull: false })
-    id: string;
-
     @ApiProperty({ example: "2000" })
     @Column({ type: DataType.STRING, allowNull: false })
     otp: string;

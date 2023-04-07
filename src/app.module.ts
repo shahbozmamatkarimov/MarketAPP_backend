@@ -23,6 +23,9 @@ import { Comments } from './comments/entities/comment.entity';
 import { Location } from './location/entities/location.entity';
 import { District } from './district/entities/district.entity';
 import { Region } from './region/entities/region.entity';
+import { MailModule } from './mail/mail.module';
+import { OtpModule } from './otp/otp.module';
+import { Otp } from './otp/models/otp.model';
 
 @Module({
   imports: [
@@ -37,7 +40,7 @@ import { Region } from './region/entities/region.entity';
       username: 'postgres',
       password: '2303',
       database: 'marketapp',
-      models: [Admin, User, Like, Product, Card, ProductType, Comments, Location, District, Region],
+      models: [Admin, User, Like, Product, Card, ProductType, Comments, Location, District, Region, Otp],
       autoLoadModels: true,
       logging: true
     }),
@@ -51,6 +54,8 @@ import { Region } from './region/entities/region.entity';
     LocationModule,
     DistrictModule,
     RegionModule,
+    MailModule,
+    OtpModule,
   ],
   controllers: [],
   providers: [],

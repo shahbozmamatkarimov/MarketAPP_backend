@@ -11,7 +11,6 @@ interface UserAttr {
     email: string;
     hashed_password: string;
     hashed_refresh_token: string;
-
 }
 
 @Table({ tableName: 'user' })

@@ -2,12 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateLikeDto {
-    @ApiProperty({ example: 'Kattaqo\'rg\'on', description: "district" })
+    @ApiProperty({ example: '12', description: "likes" })
     @IsNotEmpty()
     @IsNumber()
     likes: number;
 
-    @ApiProperty({ example: 'Kattaqo\'rg\'on', description: "district" })
+    @ApiProperty({ example: '23', description: "dislikes" })
     @IsNotEmpty()
     @IsNumber()
     dislikes: number;

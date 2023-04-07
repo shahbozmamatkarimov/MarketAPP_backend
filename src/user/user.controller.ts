@@ -3,7 +3,7 @@ import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserSelfGuard } from '../guards/user-self.guard';
+import { SelfGuard } from '../guards/user-self.guard';
 import { JwtGuard } from '../guards/jwt-auth.guard';
 import { Response } from 'express';
 import { VerifyOtpDto } from './dto/verifyOtp.dto';
@@ -19,13 +19,8 @@ export class UserController {
   @ApiOperation({ summary: 'Registration' })
   @Post('signup')
   registration(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
-    return this.usersService.registration(createUserDto, res);
+    return this.usersService.register(createUserDto, res);
   }
-
-  // @Post('find')
-  // findAll(@Body() findUserDto: FindUserDto) {
-  //   return this.usersService.findAll(findUserDto)
-  // }
 
   @ApiOperation({ summary: 'Login' })
   @HttpCode(HttpStatus.OK)
@@ -57,6 +52,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Send OTP' })
+  @UseGuards(JwtGuard)
   @Post('otp')
   newOtp(@Body() phoneUserDto: PhoneUserDto) {
     return this.usersService.newOtp(phoneUserDto);
@@ -64,14 +60,14 @@ export class UserController {
 
 
   @ApiOperation({ summary: 'Verify OTP' })
+  @UseGuards(JwtGuard)
   @Post('verify')
   verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
     return this.usersService.verifyOtp(verifyOtpDto);
   }
 
-
   @ApiOperation({ summary: 'Get user by ID' })
-  @UseGuards(UserSelfGuard)
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -79,7 +75,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Get user by email' })
-  @UseGuards(UserSelfGuard)
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Get(':email')
   getUserByEmail(@Param('email') email: string) {
@@ -89,7 +85,7 @@ export class UserController {
 
   @ApiOperation({ summary: 'Delete a user' })
   @ApiResponse({ status: 203 })
-  @UseGuards(UserSelfGuard)
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
@@ -98,7 +94,7 @@ export class UserController {
 
 
   @ApiOperation({ summary: 'Update user by ID' })
-  @UseGuards(UserSelfGuard)
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Post(':id')
   updateUser(@Param('id') updateUserDto: UpdateUserDto, id: string) {

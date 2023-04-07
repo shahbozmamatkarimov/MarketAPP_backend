@@ -9,31 +9,31 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 export class DistrictController {
   constructor(private readonly districtService:
     DistrictService) { }
-  @ApiOperation({ summary: 'Create new admin' })
+  @ApiOperation({ summary: 'Create new district' })
   @Post()
   create(@Body() createDistrictDto: CreateDistrictDto) {
     return this.districtService.create(createDistrictDto);
   }
 
-  @ApiOperation({ summary: 'Get all admins' })
+  @ApiOperation({ summary: 'Get all districts' })
   @Get()
   findAll() {
     return this.districtService.findAll();
   }
 
-  @ApiOperation({ summary: 'Get admin by id' })
+  @ApiOperation({ summary: 'Get district by id' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.districtService.findOne(+id);
   }
 
-  @ApiOperation({ summary: 'Update admin' })
+  @ApiOperation({ summary: 'Update district' })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDistrictDto: UpdateDistrictDto) {
     return this.districtService.update(+id, updateDistrictDto);
   }
 
-  @ApiOperation({ summary: 'Delete admin' })
+  @ApiOperation({ summary: 'Delete district' })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.districtService.remove(+id);

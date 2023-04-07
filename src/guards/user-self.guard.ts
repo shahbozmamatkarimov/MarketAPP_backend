@@ -2,7 +2,7 @@ import { Injectable, ExecutionContext, CanActivate, UnauthorizedException } from
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class UserSelfGuard implements CanActivate {
+export class SelfGuard implements CanActivate {
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const req = context.switchToHttp().getRequest();
@@ -10,8 +10,8 @@ export class UserSelfGuard implements CanActivate {
             throw new UnauthorizedException({
                 message: "Ruxsat etilmagan foydalanuvchi"
             });
-        } return true
-
+        } 
+        return true
     }
 }
 

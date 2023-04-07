@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateAdminDto {
-    @ApiProperty({ example: 'Name', description: "John" })
+    @ApiProperty({ example: 'Doe', description: "username" })
     @IsNotEmpty()
     @IsString()
     username: string;

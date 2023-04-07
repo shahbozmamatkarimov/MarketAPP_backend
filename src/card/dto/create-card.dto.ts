@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateCardDto {
-    @ApiProperty({ example: 'Name', description: "John" })
+    @ApiProperty({ example: 'UZCARD', description: "card type" })
     @IsNotEmpty()
     @IsString()
     type: string;
